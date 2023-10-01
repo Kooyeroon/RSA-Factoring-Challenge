@@ -1,33 +1,40 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-/*
- * find_divisor - finds the smallest divisor of a given number.
- * @num: a number to find the smallest divisor for.
- * Return: smallest divisor if found, or 0 if the number is prime.
- */
-int find_divisor(long int num)
+int main(int argc, char *argv[])
 {
-	long int factor;
+	FILE *stream;
+	char *line = NULL;
+	size_t len = 0;
+	long long flag = 1, div, rest, number, counter;
+	ssize_t nread;
 
-	if (num % 2 == 0)
-	{
-		printf("%lu=%lu*%i\n", num, num / 2, 2);
-		return 0;
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+		exit(EXIT_FAILURE);
 	}
 
-	factor = 3;
-	while (factor * factor <= num)
-	{
-		if (num % factor == 0)
-		{
-			printf("%lu=%lu*%lu\n", num, num / factor, factor);
-			return 0;
+	stream = fopen(argv[1], "r");
+	if (stream == NULL) {
+		perror("fopen");
+		exit(EXIT_FAILURE);
+	}
+
+	while ((nread = getline(&line, &len, stream)) != -1) {
+		flag = 1, div = 2;
+		number = atoll(line);
+		while (flag) {
+			rest = number % div;
+			if (!rest) {
+				counter = number / div;
+				printf("%lld=%lld*%lld\n", number, counter, div);
+				flag = 0;
+			}
+			div++;
 		}
-		else
-			factor += 2;
 	}
 
-	printf("%lu=%lu*%i\n", num, num, 1);
-
-	return 0;
+	free(line);
+	fclose(stream);
+	exit(EXIT_SUCCESS);
 }
